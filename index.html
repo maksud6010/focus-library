@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Focus Library</title>
+<!--
+  PHASE 1 PLACEHOLDER PAGE.
+  Its only jobs: give Netlify something to deploy at the site root, and act as a
+  live smoke-test — it fetches ./library.json and shows the current publish_id,
+  seq and video count. The real browsing UI (cards, filters, player) is Phase 2.
+-->
+<style>
+  :root{ --ink:#0b0d10; --panel:#14171c; --line:#242a33; --text:#e8eaed; --muted:#8a92a0; --accent:#5ac8fa; --ok:#4ade80; --warn:#fbbf24; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--ink);color:var(--text);min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Bengali",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .card{width:100%;max-width:440px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:30px 26px;text-align:center}
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--muted);display:inline-block;margin-right:8px;vertical-align:middle}
+  .dot.ok{background:var(--ok)} .dot.warn{background:var(--warn)}
+  .eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+  h1{font-size:26px;font-weight:650;letter-spacing:-.01em;margin-bottom:8px}
+  p.sub{color:var(--muted);font-size:14.5px;line-height:1.6;margin-bottom:22px}
+  .status{background:var(--ink);border:1px solid var(--line);border-radius:10px;padding:14px 16px;text-align:left;font-size:13.5px;line-height:1.9}
+  .status b{color:var(--text)} .k{color:var(--muted)}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:var(--accent);word-break:break-all}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="eyebrow">Focus Library</div>
+    <h1>শীঘ্রই আসছে</h1>
+    <p class="sub">Distraction-free video &amp; audio learning library। Admin এখন content সাজাচ্ছেন।</p>
+    <div class="status" id="status"><span class="dot" id="dot"></span><span id="line">library.json লোড হচ্ছে…</span></div>
+  </div>
+<script>
+  // Cache-bust so a just-deployed file shows immediately.
+  fetch('./library.json?_cb=' + Date.now(), { cache: 'no-store' })
+    .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(function (j) {
+      var dot = document.getElementById('dot');
+      var n = (j.videos || []).length;
+      dot.className = 'dot ' + (j.publish_id === 'bootstrap' ? 'warn' : 'ok');
+      document.getElementById('status').innerHTML =
+        '<span class="' + dot.className + '"></span>' +
+        '<b>' + (j.publish_id === 'bootstrap' ? 'Bootstrap' : 'Live') + '</b><br>' +
+        '<span class="k">videos:</span> <b>' + n + '</b><br>' +
+        '<span class="k">seq:</span> <b>' + (j.seq != null ? j.seq : '—') + '</b><br>' +
+        '<span class="k">publish_id:</span> <code>' + (j.publish_id || '—') + '</code>';
+    })
+    .catch(function (e) {
+      document.getElementById('status').innerHTML =
+        '<span class="dot warn"></span><b>library.json পড়া গেল না</b><br><span class="k">' + e.message + '</span>';
+    });
+</script>
+</body>
+</html>
